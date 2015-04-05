@@ -1,0 +1,5 @@
+.rebar/
+deps/*
+!deps/thrift
+ebin/
+thrift-idl/gen-*/

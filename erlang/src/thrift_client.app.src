@@ -1,0 +1,12 @@
+%%% -*- mode:erlang -*-
+{application, thrift_client, [
+  {description, ""},
+  {vsn, "0.1.12"},
+  {modules, [
+  ]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {included_applications, []},
+  {env, [
+  ]}
+]}.
