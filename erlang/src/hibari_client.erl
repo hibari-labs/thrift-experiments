@@ -20,6 +20,9 @@
 
 -include("hibari_thrift.hrl").
 
+-define(KEEP,    ?hibari_KeepOrReplace_Keep).
+-define(REPLACE, ?hibari_KeepOrReplace_Replace).
+
 %% 1> {ok, C0} = thrift_client_util:new("localhost", 9090, thrift_test_thrift, []), ok.
 %% ok
 %% 2> {C1, R1} = thrift_client:call(C0, testVoid, []), R1.
@@ -40,11 +43,16 @@
 t1() ->
     {ok, C0} = thrift_client_util:new("localhost", 9090, hibari_thrift, []),
     PropList = [],
+    WriteOptions0 = #writeOptions{exp_time=1234567890, value_in_ram=true},
     {C1, R1} = thrift_client:call(C0, add_kv, ["tab1", <<"key1">>, <<"val1">>,
-                                               PropList, #writeOptions{}]),
+                                               PropList, WriteOptions0]),
     io:format("R1: ~p~n", [R1]),
+
     Txn  = #op{txn=#doTransaction{}},
-    Add1 = #op{add_kv=#doAdd{key= <<"key1">>, value= <<"val1">>}},
+    Add1 = #op{replace_kv=#doReplace{key= <<"key1">>, value= <<"val1">>,
+                                     properties=[#property{key= <<"color">>, value= <<"blue">>}],
+                                     write_options=#writeOptions{exp_time_directive=?KEEP}
+                                    }},
     Add2 = #op{add_kv=#doAdd{key= <<"key2">>, value= <<"val2">>}},
     {_C2, R2} = thrift_client:call(C1, do_ops, ["tab1", [Txn, Add1, Add2], #doOptions{}]),
     io:format("R2: ~p~n", [R2]),
